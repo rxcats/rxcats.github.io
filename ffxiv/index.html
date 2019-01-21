@@ -1,87 +1,157 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="UTF-8">
     <title>Main</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+        crossorigin="anonymous">
 </head>
+
 <body class="bg-dark">
 
-<div id="wrapper">
-    <div id="content-wrapper">
-        <div class="container-fluid">
-            <form action="#">
+    <div id="wrapper">
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <form action="#">
 
-                <div class="form-group">
-                    <label for="inputMacro" class="text-white">Input Macro</label>
-                    <textarea class="form-control" id="inputMacro" rows="10"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="inputMacro" class="text-white">Input Macro</label>
+                        <textarea class="form-control" id="inputMacro" rows="20"></textarea>
+                    </div>
 
-                <div class="form-group">
-                    <label for="luaFunction" class="text-white">Output Lua Function</label>
-                    <textarea class="form-control" id="luaFunction" rows="10" readonly="readonly"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="luaFunction" class="text-white">Output Lua Function</label>
+                        <textarea class="form-control" id="luaFunction" rows="20" readonly="readonly"></textarea>
+                    </div>
 
-                <button type="submit" class="btn btn-primary" onclick="$.fn.convert()">Convert</button>
-            </form>
+                    <button type="submit" class="btn btn-primary" onclick="$.fn.convert()">Convert</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
 
-<script>
-    $(function () {
-        $.fn.convert = function () {
-            const source = $('#inputMacro').val().trim();
-
-            if (!source) {
-                return;
-            }
-
-            const skillNames = source.match(/(["]).+?\1/g);
-            if (!skillNames) {
-                return;
-            }
-
-            skillNames.map(function (str) {
-                return str.replace(/"/gi, '')
-            });
-
-            const waitSeconds = source.match(/<wait.(.?)/g);
-            if (!waitSeconds) {
-                return;
-            }
-
-            waitSeconds.map(function (str) {
-                return str.replace('<wait.', '')
-            }).map(function (sec) {
-                const _sec = parseInt(sec);
-                if (_sec === 2) {
-                    return 2000;
-                } else if (_sec === 3) {
-                    return 2700;
-                }
-                return 0;
-            });
-
-            const skillMap = {};
-
-            for (let i = 0; i < skillNames.length; i++) {
-                skillMap[skillNames[i]] = {
-                    key: '',
-                    sleep: waitSeconds[i],
-                    skill: skillNames[i],
-                }
-            }
-
-            console.log(skillMap);
-
-            $('#luaFunction').text(skillMap);
-
+    <script>
+        const skillShortCutKeys = {};
+        skillShortCutKeys["g"] = { key: "g", sleep: 0, skill: "주시 작업" };
+        skillShortCutKeys["t"] = { key: "t", sleep: 0, skill: "주시 가공" };
+        skillShortCutKeys["f1"] = { key: "f1", sleep: 0, skill: "경과 관찰" };
+        skillShortCutKeys["f2"] = { key: "f2", sleep: 0, skill: "절약 가공" };
+        skillShortCutKeys["f3"] = { key: "f3", sleep: 0, skill: "가공" };
+        skillShortCutKeys["f4"] = { key: "f4", sleep: 0, skill: "중급 가공" };
+        skillShortCutKeys["f5"] = { key: "f5", sleep: 0, skill: "고급 가공" };
+        skillShortCutKeys["f6"] = { key: "f6", sleep: 0, skill: "견실한 마음가짐" };
+        skillShortCutKeys["f7"] = { key: "f7", sleep: 0, skill: "견실한 작업" };
+        skillShortCutKeys["f8"] = { key: "f8", sleep: 0, skill: "꾸준한 진척" };
+        skillShortCutKeys["f9"] = { key: "f9", sleep: 0, skill: "확신" };
+        skillShortCutKeys["f10"] = { key: "f10", sleep: 0, skill: "작업 요령" };
+        skillShortCutKeys["f11"] = { key: "f11", sleep: 0, skill: "정신 집중" };
+        skillShortCutKeys["f12"] = { key: "f12", sleep: 0, skill: "교묘한 손놀림 2" };
+        skillShortCutKeys["1"] = { key: "1", sleep: 0, skill: "모범 작업 2" };
+        skillShortCutKeys["2"] = { key: "2", sleep: 0, skill: "모범 작업 3" };
+        skillShortCutKeys["3"] = { key: "3", sleep: 0, skill: "성급한 손길" };
+        skillShortCutKeys["4"] = { key: "4", sleep: 0, skill: "성급한 손길 2" };
+        skillShortCutKeys["5"] = { key: "5", sleep: 0, skill: "비레고의 축복" };
+        skillShortCutKeys["6"] = { key: "6", sleep: 0, skill: "비레고의 기교" };
+        skillShortCutKeys["7"] = { key: "7", sleep: 0, skill: "혁신" };
+        skillShortCutKeys["8"] = { key: "8", sleep: 0, skill: "장족의 발전" };
+        skillShortCutKeys["9"] = { key: "9", sleep: 0, skill: "독창적 발상" };
+        skillShortCutKeys["0"] = { key: "0", sleep: 0, skill: "독창적 발상 2" };
+        skillShortCutKeys["minus"] = { key: "minus", sleep: 0, skill: "안정된 솜씨" };
+        skillShortCutKeys["equal"] = { key: "equal", sleep: 0, skill: "안정된 솜씨 2" };
+        
+        const _skillShortCutKeys = {};
+        for (const s of Object.values(skillShortCutKeys)) {
+            _skillShortCutKeys[s.skill] = s;
         }
-    });
-</script>
+
+        $(function () {
+            $.fn.convert = function () {
+                const source = $('#inputMacro').val().trim();
+
+                if (!source) {
+                    return;
+                }
+
+                const _skillNames = source.match(/(["]).+?\1/g);
+                if (!_skillNames) {
+                    return;
+                }
+
+                const skillNames = _skillNames.map(function (str) {
+                    return str.replace(/"/gi, '')
+                });
+
+                const _waitSeconds = source.match(/<wait.(.?)/g);
+                if (!_waitSeconds) {
+                    return;
+                }
+
+                const waitSeconds = _waitSeconds.map(function (str) {
+                    return str.replace('<wait.', '')
+                }).map(function (sec) {
+                    const _sec = parseInt(sec);
+                    if (_sec === 2) {
+                        return 2000;
+                    } else if (_sec === 3) {
+                        return 2700;
+                    }
+                    return 0;
+                });
+
+                for (let i = 0; i < skillNames.length; i++) {
+                    _skillShortCutKeys[skillNames[i]]['sleep'] = waitSeconds[i];
+                }
+
+                const fnName = 'do_xxxxx';
+
+                let luaFunction = `
+function ${fnName.replace('-', '_')}(_until)
+    cnt = 0
+    repeat
+        cnt = cnt + 1
+
+        --왼쪽 마우스 클릭
+        PressMouseButton(1)
+        Sleep(100)
+        ReleaseMouseButton(1)
+        if sleepAndCheckBreak(2000) then break end
+    `;
+
+                for (const skill of skillNames) {
+                    if (_skillShortCutKeys[skill].sleep === 0) {
+                        alert(skill + ', sleep is zero');
+                    }
+
+                    luaFunction += `
+        -- ${skill}
+        PressAndReleaseKey(skillKeys["${_skillShortCutKeys[skill].key}"].key)
+        if sleepAndCheckBreak(${_skillShortCutKeys[skill].sleep}) then break end
+                    `;
+                }
+
+                luaFunction += `
+        OutputLogMessage("Loop = %s / %s\\n", cnt, _until)
+        OutputLCDMessage("Loop = " .. cnt, 5000)
+                `;
+
+                luaFunction += `
+        if (cnt < _until) then
+            if sleepAndCheckBreak(3300) then break end
+        end
+
+    until cnt == _until
+end
+`;
+
+                $('#luaFunction').text(luaFunction);
+            }
+        });
+    </script>
 
 </body>
+
 </html>
