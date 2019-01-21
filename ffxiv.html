@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+</head>
+<body class="bg-dark">
+
+<div id="wrapper">
+    <div id="content-wrapper">
+        <div class="container-fluid">
+            <form action="#">
+
+                <div class="form-group">
+                    <label for="inputMacro" class="text-white">Input Macro</label>
+                    <textarea class="form-control" id="inputMacro" rows="10"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="luaFunction" class="text-white">Output Lua Function</label>
+                    <textarea class="form-control" id="luaFunction" rows="10" readonly="readonly"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" onclick="$.fn.convert()">Convert</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+
+<script>
+    $(function () {
+        $.fn.convert = function () {
+            const source = $('#inputMacro').val().trim();
+
+            if (!source) {
+                return;
+            }
+
+            const skillNames = source.match(/(["]).+?\1/g);
+            if (!skillNames) {
+                return;
+            }
+
+            skillNames.map(function (str) {
+                return str.replace(/"/gi, '')
+            });
+
+            const waitSeconds = source.match(/<wait.(.?)/g);
+            if (!waitSeconds) {
+                return;
+            }
+
+            waitSeconds.map(function (str) {
+                return str.replace('<wait.', '')
+            }).map(function (sec) {
+                const _sec = parseInt(sec);
+                if (_sec === 2) {
+                    return 2000;
+                } else if (_sec === 3) {
+                    return 2700;
+                }
+                return 0;
+            });
+
+            const skillMap = {};
+
+            for (let i = 0; i < skillNames.length; i++) {
+                skillMap[skillNames[i]] = {
+                    key: '',
+                    sleep: waitSeconds[i],
+                    skill: skillNames[i],
+                }
+            }
+
+            console.log(skillMap);
+
+            $('#luaFunction').text(skillMap);
+
+        }
+    });
+</script>
+
+</body>
+</html>
